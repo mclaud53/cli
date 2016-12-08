@@ -65,7 +65,7 @@ for (var module in natives) {
 }
 
 cli.output = console.log;
-cli.exit = require('exit');
+cli.exit = exit;
 
 cli.no_color = false;
 if (process.env.NODE_DISABLE_COLORS || process.env.TERM === 'dumb') {
