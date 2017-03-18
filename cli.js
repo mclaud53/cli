@@ -27,8 +27,7 @@
 var cli = exports,
     argv, curr_opt, curr_val, full_opt, is_long,
     short_tags = [], opt_list, parsed = {},
-    usage, argv_parsed, command_list, commands,
-    show_debug;
+    usage, argv_parsed, command_list, commands;
 
 cli.app = null;
 cli.version = null;
@@ -38,6 +37,7 @@ cli.argc = 0;
 cli.options = {};
 cli.args = [];
 cli.command = null;
+cli.show_debug = false;
 
 cli.width = 70;
 cli.option_width = 25;
@@ -346,7 +346,7 @@ cli.parse = function (opts, command_def) {
                 cli.no_color = (o === 'k' || o === 'no-color');
                 continue;
             } else if (enable.status && (o === 'debug')) {
-                show_debug = o === 'debug';
+                cli.show_debug = o === 'debug';
                 continue;
             } else if (enable.timeout && (o === 't' || o === 'timeout')) {
                 var secs = cli.getInt();
@@ -460,7 +460,7 @@ cli.status = function (msg, type) {
         console.error(msg);
         return cli.exit(1);
     }
-    if (enable.status && !show_debug && type === 'debug') {
+    if (enable.status && !cli.show_debug && type === 'debug') {
         return;
     }
     console.error(msg);
