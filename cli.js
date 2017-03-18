@@ -65,7 +65,7 @@ for (var module in natives) {
 }
 
 cli.output = console.log;
-cli.exit = require('exit');
+cli.exit = process.exit;
 
 cli.no_color = false;
 if (process.env.NODE_DISABLE_COLORS || process.env.TERM === 'dumb') {
@@ -83,12 +83,13 @@ if (process.env.NODE_DISABLE_COLORS || process.env.TERM === 'dumb') {
  * The 'help' plugin is enabled by default.
  */
 var enable = {
-    help: true,      //Adds -h, --help
-    version: false,  //Adds -v,--version => gets version by parsing a nearby package.json
-    status: false,   //Adds -k,--no-color & --debug => display plain status messages /display debug messages
-    timeout: false,  //Adds -t,--timeout N => timeout the process after N seconds
-    catchall: false, //Adds -c,--catch => catch and output uncaughtExceptions
-    glob: false      //Adds glob matching => use cli.glob(arg)
+    help: true,             //Adds -h, --help
+    version: false,         //Adds -v,--version => gets version by parsing a nearby package.json
+    status: false,          //Adds -k,--no-color & --debug => display plain status messages /display debug messages
+    timeout: false,         //Adds -t,--timeout N => timeout the process after N seconds
+    catchall: false,        //Adds -c,--catch => catch and output uncaughtExceptions
+    glob: false,            //Adds glob matching => use cli.glob(arg)
+    suppresshelptype: false //Adds the suppression of type display in --help output
 }
 cli.enable = function (/*plugins*/) {
     Array.prototype.slice.call(arguments).forEach(function (plugin) {
@@ -104,6 +105,9 @@ cli.enable = function (/*plugins*/) {
             break;
         case 'glob':
             cli.glob = require('glob');
+            break;
+        case 'suppresshelptype':
+            cli.suppresshelptype = true;
             break;
         default:
             cli.fatal('Unknown plugin "' + plugin + '"');
@@ -617,7 +621,7 @@ cli.getUsage = function (code) {
         }
         line += ' ';
 
-        if (type) {
+        if (!cli.suppresshelptype && type) {
             if (type instanceof Array) {
                 desc += '. VALUE must be either [' + type.join('|') + ']';
                 type = 'VALUE';
@@ -724,10 +728,6 @@ cli.getValue = function (default_val, validate_func, err_msg) {
 
         value = argv.shift();
 
-        if (value.match(/^[0-9]+$/)) {
-            value = parseInt(value, 10);
-        }
-
         //Run the value through a validation/transformation function if specified
         if (validate_func) {
             value = validate_func(value);
@@ -807,7 +807,7 @@ cli.getIp = function (default_val) {
 cli.getPath = function (default_val, identifier) {
     identifier = identifier || 'path';
     return cli.getValue(default_val, function (value) {
-        if (value.match(/[?*;{}]/)) {
+        if (value.match(/[?*:{}]/)) {
             throw 'Invalid path';
         }
         return value;

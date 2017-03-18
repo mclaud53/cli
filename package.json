@@ -14,8 +14,7 @@
     "url": "http://github.com/node-js-libs/cli.git"
   },
   "dependencies": {
-    "glob": "^7.1.1",
-    "exit": "0.1.2"
+    "glob": "^7.1.1"
   },
   "contributors": [
     { "name": "Douglas Meyer", "github": "https://github.com/DouglasMeyer" }
